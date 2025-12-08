@@ -1,20 +1,172 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🥣 Anti-Soup Battle (反鸡汤联盟)
 
-# Run and deploy your AI Studio app
+![Status](https://img.shields.io/badge/Status-Active-success)
+![React](https://img.shields.io/badge/React-19-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8)
+![Gemini AI](https://img.shields.io/badge/AI-Gemini_Flash-8e75b2)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-This contains everything you need to run your app locally.
+> **现实与幻想的终极PK赛。**  
+> 这是一个专注于反对虚假心灵鸡汤的社区。在这里，"毒鸡汤"（现实）与"热鸡汤"（幻想）交锋，由用户投票决定谁才是生活的真理。
 
-View your app in AI Studio: https://ai.studio/apps/drive/1QOXHtDtDx_skhuk_Trf72ma-X8exRa0b
+---
 
-## Run Locally
+## ✨ 核心特性 (Features)
 
-**Prerequisites:**  Node.js
+### ⚖️ 观点PK (Battle Arena)
+- **实时PK**: 首页展示正在进行的观点PK，红蓝阵营视觉冲击。
+- **互动反馈**: 支持点赞、鼓掌、震惊等多种表情态势，投票后可见比例。
+- **话题系统**: 支持话题分类（如工作、爱情、内卷），后台可管理话题状态。
 
+### 🤖 AI 鸡汤粉碎机 (AI Generator)
+- **Gemini 驱动**: 集成 Google Gemini 2.5 Flash 模型。
+- **智能生成**: 输入或选择话题，AI 自动生成一对"虚伪鸡汤"与"残酷真相"。
+- **编辑与发布**: 生成的内容支持用户在发布前二次编辑（限500字），发布后自动进入审核队列。
+- **限流机制**: 普通用户每日有限额，管理员无限制。
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 🛡️ 完善的后台管理 (Admin System)
+- **RBAC 权限控制**: 
+    - **超级管理员**: 管理员成员管理、系统全局配置（每日限额、邮件服务、默认主题）。
+    - **内容管理员**: 审核PK内容（支持修改文字）、管理评论、管理话题。
+- **数据管理**: 支持回收站机制、置顶推荐、强制结束投票。
+
+### 🎨 现代化 UI/UX
+- **深色模式**: 支持浅色/深色/跟随系统自动切换。
+- **响应式设计**: 完美适配移动端与桌面端。
+- **交互细节**: 粒子投票动效、骨架屏加载、Toast 提示。
+
+---
+
+## 🛠️ 技术栈 (Tech Stack)
+
+- **Frontend**: React 19, TypeScript
+- **Styling**: Tailwind CSS, Lucide React Icons
+- **AI Integration**: Google GenAI SDK (`@google/genai`)
+- **Database Strategy**: 
+    - **Development**: In-Memory Mock Data (无数据库也可运行)
+    - **Production**: PostgreSQL (推荐 Vercel Postgres)
+- **Build Tool**: Parcel / Vite
+
+---
+
+## 🚀 快速开始 (Getting Started)
+
+### 1. 环境准备
+
+确保本地已安装 Node.js 18+。
+
+```bash
+git clone https://github.com/your-username/anti-soup-battle.git
+cd anti-soup-battle
+npm install
+```
+
+### 2. 环境变量配置
+
+在项目根目录创建 `.env.local` 文件：
+
+```env
+# Google Gemini API Key (必须)
+# 获取地址: https://aistudio.google.com/app/apikey
+API_KEY=your_gemini_api_key_here
+
+# PostgreSQL 连接 (可选，不填则使用模拟数据模式)
+POSTGRES_URL=postgres://user:password@host:port/database
+
+# 邮件服务配置 (可选，用于 Magic Link 登录)
+# 如果不配置，系统会在控制台直接打印模拟登录链接
+# EMAILJS_SERVICE_ID=...
+# MAILGUN_API_KEY=...
+```
+
+### 3. 启动开发服
+
+```bash
+npm start
+```
+
+访问 `http://localhost:1234` 即可看到应用。
+
+---
+
+## 🗄️ 数据库配置 (Database Setup)
+
+虽然项目内置了 Mock 数据模式，但为了持久化存储，建议连接 PostgreSQL。
+
+### 1. 创建表结构
+项目提供了完整的 SQL 结构文件。连接你的数据库并执行以下文件中的 SQL 语句：
+
+- 文件路径: `docs/schema.sql`
+
+如果你使用 Vercel Postgres，可以在 Dashboard 的 "Query" 选项卡中直接粘贴执行。
+
+### 2. 初始化超级管理员
+数据库建立后，你需要创建一个初始的超级管理员账号才能访问后台。
+
+1. 修改 `docs/init_admin.js` (可选):
+   如果你想直接指定特定的邮箱为管理员，可以编辑该文件中的 `SUPER_ADMIN` 对象。
+
+2. 运行初始化脚本:
+   ```bash
+   node docs/init_admin.js
+   ```
+
+3. 登录:
+   - 启动应用。
+   - 点击右上角 "登录"。
+   - 如果配置了邮件服务，发送链接并点击。
+   - 如果是本地测试，点击弹窗底部的 **"我是超级管理员 (演示通道)"** 即可模拟登录。
+
+---
+
+## 📦 部署指南 (Deployment)
+
+本项目针对 Vercel 进行了优化。
+
+1. **Fork 本仓库** 到你的 GitHub。
+2. **登录 Vercel** 并点击 "Add New Project"。
+3. 选择你的仓库进行导入。
+4. **配置环境变量**:
+   - `API_KEY`: 你的 Gemini API Key。
+   - `POSTGRES_URL`: 在 Vercel 项目页面点击 "Storage" -> "Create Database" -> "Postgres"，Vercel 会自动为你注入此变量。
+5. **部署**: 点击 Deploy。
+6. **初始化数据库**:
+   - 部署完成后，进入 Vercel Storage 控制台。
+   - 使用 Query 运行 `docs/schema.sql` 的内容。
+   - 在本地运行 `node docs/init_admin.js` (确保本地 .env.local 连接的是线上的数据库)，或手动在数据库插入管理员记录。
+
+---
+
+## 📂 目录结构 (Project Structure)
+
+```
+.
+├── components/        # React UI 组件
+│   ├── HeroBattle.tsx     # 核心PK卡片
+│   ├── Generator.tsx      # AI 生成器
+│   ├── AdminPanel.tsx     # 后台管理面板
+│   └── ...
+├── services/          # 业务逻辑服务
+│   ├── geminiService.ts   # AI 接口封装
+│   ├── dataProvider.ts    # 数据层 (适配 API/Mock)
+│   └── mockDb.ts          # 本地模拟数据
+├── docs/              # 文档与数据库脚本
+│   ├── schema.sql         # 数据库表结构
+│   └── init_admin.js      # 管理员初始化脚本
+├── types.ts           # TypeScript 类型定义
+└── App.tsx            # 应用主入口
+```
+
+## 🤝 贡献 (Contributing)
+
+欢迎提交 Issue 或 Pull Request 来丰富这个反鸡汤的世界！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
+
+## 📄 许可证 (License)
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
