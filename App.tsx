@@ -71,6 +71,22 @@ const App: React.FC = () => {
       setSystemConfig(fetchedConfig);
       setTopics(fetchedTopics);
       
+      // Handle Deep Linking (URL Parameters)
+      const params = new URLSearchParams(window.location.search);
+      const sharedBattleId = params.get('battleId');
+      
+      if (sharedBattleId) {
+          // Check if battle exists (optional, but good for UX)
+          const battleExists = fetchedBattles.find(b => b.id === sharedBattleId);
+          if (battleExists) {
+              setSelectedBattleId(sharedBattleId);
+              setCurrentView('detail');
+          } else {
+              // Clean URL if battle not found
+              window.history.replaceState({}, '', window.location.pathname);
+          }
+      }
+
       setIsInitializing(false);
     };
 
@@ -258,6 +274,17 @@ const App: React.FC = () => {
       setSelectedBattleId(battleId);
       setCurrentView('detail');
       window.scrollTo(0, 0);
+      
+      // Update URL without reloading to support sharing from this state
+      const newUrl = `${window.location.pathname}?battleId=${battleId}`;
+      window.history.pushState({ path: newUrl }, '', newUrl);
+  };
+  
+  // Handle going back home
+  const handleBackToHome = () => {
+      setCurrentView('home');
+      // Reset URL to clean
+      window.history.pushState({ path: window.location.pathname }, '', window.location.pathname);
   };
 
   // Comment Handling
@@ -350,6 +377,8 @@ const App: React.FC = () => {
                 setShowLoginModal(true);
             } else {
                 setCurrentView(view);
+                // Clean url if navigating via nav
+                window.history.pushState({ path: window.location.pathname }, '', window.location.pathname);
             }
         }} 
         user={user} 
@@ -443,7 +472,7 @@ const App: React.FC = () => {
             onVote={handleVote}
             onAddComment={handleAddComment}
             onReaction={handleReaction}
-            onBack={() => setCurrentView('home')} 
+            onBack={handleBackToHome} 
             onRequireLogin={openLogin}
           />
         )}

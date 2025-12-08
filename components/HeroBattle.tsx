@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Battle, ReactionType } from '../types';
-import { ThumbsUp, MessageCircleWarning, Heart, Share2, Check, Clock, MessageSquare, Plus, Smile } from 'lucide-react';
+import { ThumbsUp, MessageCircleWarning, Heart, Check, Clock, MessageSquare, Plus, Smile, Link as LinkIcon } from 'lucide-react';
 
 interface HeroBattleProps {
   battle: Battle;
@@ -54,29 +54,30 @@ const HeroBattle: React.FC<HeroBattleProps> = ({ battle, userReaction, onVote, o
     }, 300);
   };
 
-  const handleShare = async () => {
-    const shareText = `【反鸡汤联盟】\n\n🔵 现实: ${battle.antiContent}\n⚡ VS\n🔴 鸡汤: ${battle.soupContent}\n\n#反鸡汤联盟`;
-    const shareUrl = window.location.href;
+  const getShareUrl = () => {
+      // Construct deep link
+      return `${window.location.origin}${window.location.pathname}?battleId=${battle.id}`;
+  };
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: '反鸡汤联盟 - 现实 vs 幻想',
-          text: shareText,
-          url: shareUrl,
-        });
-      } catch (err) {
-        console.log('Share cancelled');
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+  const handleCopyLink = async () => {
+    const shareUrl = getShareUrl();
+    try {
+        await navigator.clipboard.writeText(shareUrl);
         setShowCopied(true);
         setTimeout(() => setShowCopied(false), 2000);
-      } catch (err) {
+    } catch (err) {
         console.error('Failed to copy');
-      }
     }
+  };
+
+  const handleShareToX = () => {
+      const shareUrl = getShareUrl();
+      const text = `【反鸡汤联盟】\n\n🔵 Reality: ${battle.antiContent}\n⚡ VS\n🔴 Fantasy: ${battle.soupContent}\n\n👇 谁是真理？来投票！`;
+      const hashtags = "反鸡汤联盟,AntiSoup";
+      
+      const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}&hashtags=${encodeURIComponent(hashtags)}`;
+      
+      window.open(intentUrl, '_blank', 'width=600,height=400');
   };
 
   const handleReactionClick = (type: ReactionType) => {
@@ -107,21 +108,41 @@ const HeroBattle: React.FC<HeroBattleProps> = ({ battle, userReaction, onVote, o
   return (
     <div className="w-full flex flex-col md:flex-row relative overflow-hidden rounded-3xl shadow-2xl my-4 md:my-8 md:h-[600px] group/card select-none md:select-auto">
       
-      {/* Share & Detail Buttons */}
+      {/* Share & Detail Buttons Container */}
       <div className="absolute top-16 md:top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-        <button
-            onClick={handleShare}
-            className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full text-white border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg group/share"
-            title="分享这场PK"
-        >
-            {showCopied ? <Check className="w-3 h-3 md:w-4 md:h-4 text-green-400" /> : <Share2 className="w-3 h-3 md:w-4 md:h-4 group-hover/share:text-blue-200" />}
-            <span className="text-[10px] md:text-xs font-bold tracking-wide">{showCopied ? '已复制' : '分享'}</span>
-        </button>
+        
+        {/* Share Group */}
+        <div className="flex items-center p-1 bg-black/20 backdrop-blur-md rounded-full border border-white/20 shadow-lg">
+            {/* Copy Link */}
+            <button
+                onClick={handleCopyLink}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white/20 text-white transition-all active:scale-95 group/copy"
+                title="复制链接"
+            >
+                {showCopied ? <Check className="w-3 h-3 md:w-4 md:h-4 text-green-400" /> : <LinkIcon className="w-3 h-3 md:w-4 md:h-4 group-hover/copy:text-blue-200" />}
+                <span className="text-[10px] md:text-xs font-bold tracking-wide">{showCopied ? '已复制' : '复制'}</span>
+            </button>
+            
+            <div className="w-px h-3 bg-white/20 mx-1"></div>
+
+            {/* Share to X */}
+            <button
+                onClick={handleShareToX}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-black/40 text-white transition-all active:scale-95 group/x"
+                title="分享到 X (Twitter)"
+            >
+                 {/* X Logo SVG */}
+                <svg viewBox="0 0 24 24" className="w-3 h-3 md:w-4 md:h-4 fill-current group-hover/x:text-white" aria-hidden="true">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                <span className="text-[10px] md:text-xs font-bold tracking-wide">分享</span>
+            </button>
+        </div>
         
         {onViewDetail && (
             <button
                 onClick={() => onViewDetail(battle.id)}
-                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg group/detail"
+                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg group/detail h-[34px] md:h-[40px]"
                 title="查看详情与评论"
             >
                 <MessageSquare className="w-3 h-3 md:w-4 md:h-4 group-hover/detail:text-blue-200" />
