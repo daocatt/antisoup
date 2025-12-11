@@ -19,12 +19,12 @@ POSTGRES_URL="postgres://default:xxxxxx@ep-xxxx.us-east-1.postgres.vercel-storag
 
 ## 2. 初始化数据库结构 (Schema)
 
-`docs/schema.sql` 包含了完整的表结构定义。
+`docs/antisoup_schema.sql` 包含了完整的表结构定义。
 
 **方法 A: Vercel Dashboard (推荐)**
 1. 打开 Vercel 项目控制台 -> Storage -> Postgres -> Data.
 2. 点击 "Query" 标签页。
-3. 复制 `docs/schema.sql` 的内容并在查询框中运行。
+3. 复制 `docs/antisoup_schema.sql` 的内容并在查询框中运行。
 
 **方法 B: 命令行工具**
 如果你配置了本地 psql 或其他数据库客户端，直接连接并运行 SQL 文件即可。
