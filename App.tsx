@@ -74,45 +74,17 @@ const App: React.FC = () => {
       // Handle Deep Linking (URL Parameters)
       const params = new URLSearchParams(window.location.search);
       const sharedBattleId = params.get('battleId');
-      const token = params.get('token');
       
       if (sharedBattleId) {
-          // Check if battle exists (optional, but good for UX)
+          // Check if battle exists
           const battleExists = fetchedBattles.find(b => b.id === sharedBattleId);
           if (battleExists) {
               setSelectedBattleId(sharedBattleId);
               setCurrentView('detail');
           } else {
-              // Clean URL if battle not found
-              window.history.replaceState({}, '', window.location.pathname);
-          }
-      }
-
-      if (token) {
-          try {
-              const decoded = JSON.parse(atob(token));
-              if (decoded.exp > Date.now()) {
-                  // Token is valid, create user
-                  const newUser: User = {
-                      id: `u_${btoa(decoded.email).substring(0,8)}`,
-                      name: decoded.email.split('@')[0],
-                      email: decoded.email,
-                      avatar: `https://ui-avatars.com/api/?name=${decoded.email.split('@')[0]}&background=random`,
-                      provider: 'email',
-                      role: 'user',
-                      createdAt: new Date().toISOString()
-                  };
-                  setUser(newUser);
-                  // Clean URL
-                  window.history.replaceState({}, '', window.location.pathname);
-              } else {
-                  // Token expired
-                  console.warn('Magic link token expired');
-                  window.history.replaceState({}, '', window.location.pathname);
-              }
-          } catch (e) {
-              console.error('Invalid magic link token', e);
-              window.history.replaceState({}, '', window.location.pathname);
+              // Clean URL if battle not found to avoid broken state
+              const cleanUrl = window.location.pathname;
+              window.history.replaceState({}, '', cleanUrl);
           }
       }
 
@@ -136,8 +108,6 @@ const App: React.FC = () => {
         });
 
         // Update topics count but keep status
-        // Note: Ideally this aggregation happens on the server.
-        // For now, we update the local state for display purposes.
         setTopics(prevTopics => prevTopics.map(t => ({
             ...t,
             battleCount: topicCounts.get(t.name) || 0
@@ -244,7 +214,7 @@ const App: React.FC = () => {
           };
       }));
 
-      // Record logic (mocking DB insert locally, skipping DataProvider write for records specifically to simplify demo, but recording vote)
+      // Record logic (mocking DB insert locally, skipping DataProvider write for records specifically to simplify demo)
       setReactionRecords(prev => [
           ...prev, 
           { 

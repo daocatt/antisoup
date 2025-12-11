@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Battle, ReactionType } from '../types';
-import { ThumbsUp, MessageCircleWarning, Heart, Check, Clock, MessageSquare, Plus, Smile, Link as LinkIcon } from 'lucide-react';
+import { ThumbsUp, MessageCircleWarning, Heart, Check, Clock, MessageSquare, Plus, Smile, Link as LinkIcon, Share2 } from 'lucide-react';
 
 interface HeroBattleProps {
   battle: Battle;
@@ -55,7 +55,7 @@ const HeroBattle: React.FC<HeroBattleProps> = ({ battle, userReaction, onVote, o
   };
 
   const getShareUrl = () => {
-      // Construct deep link
+      // Construct deep link with origin and current path + query param
       return `${window.location.origin}${window.location.pathname}?battleId=${battle.id}`;
   };
 
@@ -109,44 +109,44 @@ const HeroBattle: React.FC<HeroBattleProps> = ({ battle, userReaction, onVote, o
     <div className="w-full flex flex-col md:flex-row relative overflow-hidden rounded-3xl shadow-2xl my-4 md:my-8 md:h-[600px] group/card select-none md:select-auto">
       
       {/* Share & Detail Buttons Container */}
-      <div className="absolute top-16 md:top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+      <div className="absolute top-16 md:top-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2">
         
         {/* Share Group */}
-        <div className="flex items-center p-1 bg-black/20 backdrop-blur-md rounded-full border border-white/20 shadow-lg">
+        <div className="flex items-center p-1.5 bg-black/30 backdrop-blur-md rounded-full border border-white/20 shadow-lg">
             {/* Copy Link */}
             <button
                 onClick={handleCopyLink}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white/20 text-white transition-all active:scale-95 group/copy"
-                title="复制链接"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all active:scale-95 group/copy ${showCopied ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10 text-white'}`}
+                title="复制PK详情链接"
             >
-                {showCopied ? <Check className="w-3 h-3 md:w-4 md:h-4 text-green-400" /> : <LinkIcon className="w-3 h-3 md:w-4 md:h-4 group-hover/copy:text-blue-200" />}
-                <span className="text-[10px] md:text-xs font-bold tracking-wide">{showCopied ? '已复制' : '复制'}</span>
+                {showCopied ? <Check className="w-3.5 h-3.5" /> : <LinkIcon className="w-3.5 h-3.5 group-hover/copy:text-blue-200" />}
+                <span className="text-xs font-bold tracking-wide">{showCopied ? '已复制' : '复制链接'}</span>
             </button>
             
-            <div className="w-px h-3 bg-white/20 mx-1"></div>
+            <div className="w-px h-4 bg-white/20 mx-1"></div>
 
-            {/* Share to X */}
+            {/* Share to X (Twitter) with Custom Logo */}
             <button
                 onClick={handleShareToX}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-black/40 text-white transition-all active:scale-95 group/x"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white/10 text-white transition-all active:scale-95 group/x"
                 title="分享到 X (Twitter)"
             >
-                 {/* X Logo SVG */}
-                <svg viewBox="0 0 24 24" className="w-3 h-3 md:w-4 md:h-4 fill-current group-hover/x:text-white" aria-hidden="true">
+                 {/* X (Twitter) Logo SVG - The requested image for sharing */}
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current" aria-hidden="true">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
-                <span className="text-[10px] md:text-xs font-bold tracking-wide">分享</span>
+                <span className="text-xs font-bold tracking-wide">分享</span>
             </button>
         </div>
         
         {onViewDetail && (
             <button
                 onClick={() => onViewDetail(battle.id)}
-                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg group/detail h-[34px] md:h-[40px]"
+                className="flex items-center gap-2 px-4 py-1.5 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg group/detail"
                 title="查看详情与评论"
             >
-                <MessageSquare className="w-3 h-3 md:w-4 md:h-4 group-hover/detail:text-blue-200" />
-                <span className="text-[10px] md:text-xs font-bold tracking-wide">详情</span>
+                <MessageSquare className="w-3.5 h-3.5 group-hover/detail:text-blue-200" />
+                <span className="text-xs font-bold tracking-wide">查看详情</span>
             </button>
         )}
       </div>

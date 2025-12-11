@@ -16,8 +16,8 @@ class EmailService {
      * Sends a magic login link to the user.
      */
     async sendLoginLink(email: string, config: SystemConfig): Promise<SendLoginLinkResult> {
-        // 1. Generate a mock token and link (expires in 10 minutes)
-        const token = btoa(JSON.stringify({ email, exp: Date.now() + 600000 }));
+        // 1. Generate a mock token and link
+        const token = btoa(JSON.stringify({ email, exp: Date.now() + 3600000 }));
         const magicLink = `${window.location.origin}?token=${token}`; 
         
         console.log(`[EmailService] Generated Magic Link for ${email}: ${magicLink}`);
