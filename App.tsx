@@ -177,7 +177,7 @@ const App: React.FC = () => {
     // Cycle: light -> dark -> system -> light
     let nextTheme: ThemeMode;
     const current = userTheme || systemConfig.defaultTheme;
-
+    
     if (current === 'light') nextTheme = 'dark';
     else if (current === 'dark') nextTheme = 'system';
     else nextTheme = 'light';

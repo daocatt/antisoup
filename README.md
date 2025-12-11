@@ -40,7 +40,7 @@
 ## 🛠️ 技术栈 (Tech Stack)
 
 - **Frontend**: React 19, TypeScript
-- **Styling**: Tailwind CSS, Lucide React Icons
+- **Styling**: Tailwind CSS (PostCSS integration), Lucide React Icons
 - **AI Integration**: Google GenAI SDK (`@google/genai`)
 - **Database Strategy**: 
     - **Development**: In-Memory Mock Data (无数据库也可运行)
