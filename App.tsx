@@ -74,6 +74,7 @@ const App: React.FC = () => {
       // Handle Deep Linking (URL Parameters)
       const params = new URLSearchParams(window.location.search);
       const sharedBattleId = params.get('battleId');
+      const token = params.get('token');
       
       if (sharedBattleId) {
           // Check if battle exists (optional, but good for UX)
@@ -83,6 +84,34 @@ const App: React.FC = () => {
               setCurrentView('detail');
           } else {
               // Clean URL if battle not found
+              window.history.replaceState({}, '', window.location.pathname);
+          }
+      }
+
+      if (token) {
+          try {
+              const decoded = JSON.parse(atob(token));
+              if (decoded.exp > Date.now()) {
+                  // Token is valid, create user
+                  const newUser: User = {
+                      id: `u_${btoa(decoded.email).substring(0,8)}`,
+                      name: decoded.email.split('@')[0],
+                      email: decoded.email,
+                      avatar: `https://ui-avatars.com/api/?name=${decoded.email.split('@')[0]}&background=random`,
+                      provider: 'email',
+                      role: 'user',
+                      createdAt: new Date().toISOString()
+                  };
+                  setUser(newUser);
+                  // Clean URL
+                  window.history.replaceState({}, '', window.location.pathname);
+              } else {
+                  // Token expired
+                  console.warn('Magic link token expired');
+                  window.history.replaceState({}, '', window.location.pathname);
+              }
+          } catch (e) {
+              console.error('Invalid magic link token', e);
               window.history.replaceState({}, '', window.location.pathname);
           }
       }
