@@ -63,77 +63,151 @@ npm install
 
 ### 2. 环境变量配置
 
-在项目根目录创建 `.env.local` 文件：
+创建 `.env.local` 文件并配置必要的环境变量：
 
 ```env
-# Google Gemini API Key (必须)
-# 获取地址: https://aistudio.google.com/app/apikey
+# 必选: Gemini API Key
 API_KEY=your_gemini_api_key_here
 
-# PostgreSQL 连接 (可选，不填则使用模拟数据模式)
+# 可选: 数据库连接 (不填则使用模拟数据模式)
 POSTGRES_URL=postgres://user:password@host:port/database
-
-# 邮件服务配置 (可选，用于 Magic Link 登录)
-# 如果不配置，系统会在控制台直接打印模拟登录链接
-# EMAILJS_SERVICE_ID=...
-# MAILGUN_API_KEY=...
 ```
 
-### 3. 启动开发服
+### 3. 启动开发服务器
 
 ```bash
-npm start
+npm run dev
 ```
 
-访问 `http://localhost:1234` 即可看到应用。
+访问 `http://localhost:3000` 开始体验！
+
+> 💡 **提示**: 项目支持 Mock 数据模式，无需数据库即可运行。如需持久化存储，请参考部署指南中的数据库配置步骤。
 
 ---
 
 ## 🗄️ 数据库配置 (Database Setup)
 
-虽然项目内置了 Mock 数据模式，但为了持久化存储，建议连接 PostgreSQL。
+项目支持两种数据存储模式：
 
-### 1. 创建表结构
-项目提供了完整的 SQL 结构文件。连接你的数据库并执行以下文件中的 SQL 语句：
+### Mock 数据模式 (默认)
+- **无需配置数据库**
+- 数据存储在内存中，刷新页面后重置
+- 适合快速体验和开发测试
 
-- 文件路径: `docs/schema.sql`
+### PostgreSQL 持久化模式
+项目提供了完整的数据库初始化工具：
 
-如果你使用 Vercel Postgres，可以在 Dashboard 的 "Query" 选项卡中直接粘贴执行。
+#### 本地开发环境
+```bash
+# 1. 导入表结构
+psql -d your_database_name -f docs/schema.sql
 
-### 2. 初始化超级管理员
-数据库建立后，你需要创建一个初始的超级管理员账号才能访问后台。
+# 2. 创建管理员账号
+node docs/init_admin_email.js
+```
 
-1. 修改 `docs/init_admin.js` (可选):
-   如果你想直接指定特定的邮箱为管理员，可以编辑该文件中的 `SUPER_ADMIN` 对象。
+#### Vercel 生产环境
+1. 在 Vercel Storage 控制台的 Query 选项卡中执行 `docs/schema.sql`
+2. 使用 SQL 命令手动创建管理员账号（见部署指南）
 
-2. 运行初始化脚本:
-   ```bash
-   node docs/init_admin.js
-   ```
-
-3. 登录:
-   - 启动应用。
-   - 点击右上角 "登录"。
-   - 如果配置了邮件服务，发送链接并点击。
-   - 如果是本地测试，点击弹窗底部的 **"我是超级管理员 (演示通道)"** 即可模拟登录。
+数据库表结构包含：用户、话题、PK对决、评论、投票、反应等完整功能支持。
 
 ---
 
 ## 📦 部署指南 (Deployment)
 
-本项目针对 Vercel 进行了优化。
+### 本地开发部署
 
-1. **Fork 本仓库** 到你的 GitHub。
-2. **登录 Vercel** 并点击 "Add New Project"。
-3. 选择你的仓库进行导入。
-4. **配置环境变量**:
-   - `API_KEY`: 你的 Gemini API Key。
-   - `POSTGRES_URL`: 在 Vercel 项目页面点击 "Storage" -> "Create Database" -> "Postgres"，Vercel 会自动为你注入此变量。
-5. **部署**: 点击 Deploy。
-6. **初始化数据库**:
-   - 部署完成后，进入 Vercel Storage 控制台。
-   - 使用 Query 运行 `docs/schema.sql` 的内容。
-   - 在本地运行 `node docs/init_admin.js` (确保本地 .env.local 连接的是线上的数据库)，或手动在数据库插入管理员记录。
+#### 1. 环境准备
+```bash
+git clone https://github.com/your-username/anti-soup-battle.git
+cd anti-soup-battle
+npm install
+```
+
+#### 2. 环境变量配置
+在项目根目录创建 `.env.local` 文件：
+
+```env
+# 必选配置
+API_KEY=your_gemini_api_key_here
+
+# 可选配置
+POSTGRES_URL=postgres://user:password@host:port/database
+
+# 邮件服务配置 (可选，用于 Magic Link 登录)
+EMAILJS_SERVICE_ID=your_emailjs_service_id
+EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+
+# 或者使用 Mailgun (可选)
+MAILGUN_API_KEY=your_mailgun_api_key
+MAILGUN_DOMAIN=your_mailgun_domain
+```
+
+#### 3. 数据库配置 (可选)
+如果要使用数据库持久化存储：
+
+1. **导入表结构**:
+   ```bash
+   psql -d your_database_name -f docs/schema.sql
+   ```
+
+2. **创建管理员账号**:
+   ```bash
+   node docs/init_admin_email.js
+   ```
+
+#### 4. 启动开发服务器
+```bash
+npm run dev
+```
+
+访问 `http://localhost:3000` 即可看到应用。
+
+---
+
+### Vercel 生产部署
+
+#### 1. 代码部署
+1. **Fork 本仓库** 到你的 GitHub
+2. **登录 Vercel** 并点击 "Add New Project"
+3. 选择你的仓库进行导入
+4. **部署**: 点击 Deploy
+
+#### 2. 环境变量配置
+在 Vercel Dashboard 中配置环境变量 (Settings → Environment Variables)：
+
+**必选配置:**
+- `API_KEY`: 你的 Gemini API Key (从 https://aistudio.google.com/app/apikey 获取)
+
+**可选配置:**
+- `POSTGRES_URL`: Vercel Postgres 连接字符串 (创建数据库后自动注入)
+- `EMAILJS_SERVICE_ID`: EmailJS 服务 ID
+- `EMAILJS_TEMPLATE_ID`: EmailJS 模板 ID
+- `EMAILJS_PUBLIC_KEY`: EmailJS 公钥
+- `MAILGUN_API_KEY`: Mailgun API 密钥
+- `MAILGUN_DOMAIN`: Mailgun 域名
+
+#### 3. 数据库初始化
+部署完成后初始化数据库：
+
+1. **导入表结构**:
+   - 进入 Vercel Storage 控制台 → Postgres → Data → Query
+   - 粘贴 `docs/schema.sql` 的内容并执行
+
+2. **创建管理员账号**:
+   在 Query 中执行以下 SQL (替换为你的邮箱):
+   ```sql
+   INSERT INTO users (id, name, email, avatar, provider, role, created_at)
+   VALUES ('u_admin_main', '系统管理员', 'your-email@example.com', 'https://ui-avatars.com/api/?name=Admin&background=blue', 'system', 'super_admin', CURRENT_TIMESTAMP)
+   ON CONFLICT (email) DO UPDATE SET
+       role = 'super_admin',
+       updated_at = CURRENT_TIMESTAMP;
+   ```
+
+#### 4. 访问应用
+部署完成后即可通过 Vercel 提供的域名访问应用。
 
 ---
 
